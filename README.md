@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GRILL IDEAS
 
-## Getting Started
+Жёсткая валидация бизнес-идей · maxima consulting
 
-First, run the development server:
+## Стек
+
+- Next.js 16 + Tailwind (`mc-*` palette)
+- Supabase Auth + Postgres + RLS
+- OpenRouter (`deepseek/deepseek-v4-flash`)
+- ЮKassa (999 ₽ за этапы 2–14)
+- PDF-экспорт (Puppeteer)
+
+## Локальный запуск
+
+1. Скопируйте `.env.example` → `.env.local` и заполните ключи
+2. Миграции уже в Supabase (см. `supabase/migrations/`)
+3. `npm install && npm run dev` → http://localhost:3000
+4. Webhook ЮKassa локально — HTTPS-туннель:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+./scripts/local-webhook-tunnel.sh   # localtunnel (или TUNNEL=ngrok)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+В кабинете ЮKassa → HTTP-уведомления:
+- URL: `https://<tunnel-host>/api/payment/webhook`
+- Событие: `payment.succeeded`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+На время теста оплаты: `NEXT_PUBLIC_APP_URL=https://<tunnel-host>` + перезапуск dev.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## E2E smoke
 
-## Learn More
+```bash
+# Backend: auth → analysis → webhook
+./scripts/e2e-smoke.sh
 
-To learn more about Next.js, take a look at the following resources:
+# Browser: register → form → stages 0–1 → payment gate
+node scripts/e2e-browse.mjs
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Чеклист ручного прогона:
+1. `/register` → `/dashboard/analyze`
+2. Форма 16 полей → стриминг этапа 0
+3. «Продолжить» → этап 1
+4. Экран оплаты 999 ₽ → тестовая карта ЮKassa
+5. Этапы 2–3 → `/dashboard/history` → resume
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## PDF
 
-## Deploy on Vercel
+После `status=completed`:
+- Кнопка «Скачать PDF» на экране завершения и в `/dashboard/history/[id]`
+- API: `GET /api/analysis/{id}/pdf`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Docker (VPS)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+cp .env.example .env.production
+docker compose up -d --build
+```
+
+Образ включает Chromium для PDF (`PUPPETEER_EXECUTABLE_PATH`).
+
+## Флоу
+
+1. Регистрация → форма идеи → этапы 0–1 бесплатно
+2. Оплата 999 ₽ → этапы 2–14
+3. Прогресс сохраняется · одна активная идея за раз
+4. После completed — «Начать новую идею» или PDF
+
+## Структура
+
+- `/` — лендинг (variant C Bold Verdict)
+- `/dashboard/analyze` — анализ
+- `/dashboard/history` — завершённые идеи

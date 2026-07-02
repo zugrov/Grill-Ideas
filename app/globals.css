@@ -1,26 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --mc-primary: #0d9488;
+  --mc-bg: #f8f8f7;
+  --mc-card: #ffffff;
+  --mc-text: #111827;
+  --mc-text-alt: #34322d;
+  --mc-text-second: #6b7280;
+  --mc-text-muted: #9ca3af;
+  --mc-border: #d1d5db;
+  --mc-success: #10b981;
+  --mc-error: #ef4444;
+  --mc-invert-bg: #111827;
+  --mc-invert-text: #ffffff;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-mc-primary: var(--mc-primary);
+  --color-mc-bg: var(--mc-bg);
+  --color-mc-card: var(--mc-card);
+  --color-mc-text: var(--mc-text);
+  --color-mc-text-alt: var(--mc-text-alt);
+  --color-mc-text-second: var(--mc-text-second);
+  --color-mc-text-muted: var(--mc-text-muted);
+  --color-mc-border: var(--mc-border);
+  --color-mc-success: var(--mc-success);
+  --color-mc-error: var(--mc-error);
+  --color-mc-invert-bg: var(--mc-invert-bg);
+  --color-mc-invert-text: var(--mc-invert-text);
+  --font-sans: var(--font-inter);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--mc-bg);
+  color: var(--mc-text);
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
