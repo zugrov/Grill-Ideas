@@ -1,4 +1,4 @@
-# GRILL IDEAS
+# Grill My Idea
 
 Жёсткая валидация бизнес-идей · maxima consulting
 
@@ -50,14 +50,45 @@ node scripts/e2e-browse.mjs
 - Кнопка «Скачать PDF» на экране завершения и в `/dashboard/history/[id]`
 - API: `GET /api/analysis/{id}/pdf`
 
-## Docker (VPS)
+## Docker / VPS (grill.maxima-consulting.ru)
+
+Приложение слушает **127.0.0.1:8002** — снаружи доступ через host Nginx на VPS.
+
+### Первый деплой
 
 ```bash
+cd /var/www
+git clone https://github.com/zugrov/Grill-Ideas grill-ideas
+cd grill-ideas
 cp .env.example .env.production
+# заполните .env.production (см. .env.example)
 docker compose up -d --build
+docker compose ps
 ```
 
-Образ включает Chromium для PDF (`PUPPETEER_EXECUTABLE_PATH`).
+Nginx (на VPS, не в Docker):
+
+```bash
+cp deploy/nginx/grill.maxima-consulting.ru.conf /etc/nginx/sites-available/
+ln -s /etc/nginx/sites-available/grill.maxima-consulting.ru.conf /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+certbot --nginx -d grill.maxima-consulting.ru
+```
+
+### Обновление
+
+```bash
+./scripts/deploy-vps.sh
+```
+
+### Post-deploy чеклист
+
+- `NEXT_PUBLIC_APP_URL=https://grill.maxima-consulting.ru` в `.env.production`
+- Supabase → Authentication → Redirect URLs: `https://grill.maxima-consulting.ru/**`
+- ЮKassa → HTTP-уведомления: `https://grill.maxima-consulting.ru/api/payment/webhook`
+- На prod: `DEV_SKIP_PAYMENT=false`, `NEXT_PUBLIC_DEV_SKIP_PAYMENT=false`
+
+Образ включает Chromium для PDF (`PUPPETEER_EXECUTABLE_PATH` задан в Dockerfile).
 
 ## Флоу
 
