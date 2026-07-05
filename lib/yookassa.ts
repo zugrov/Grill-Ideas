@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { PRODUCT_NAME } from "@/lib/brand";
 
 const YOOKASSA_API = "https://api.yookassa.ru/v3/payments";
 
@@ -67,7 +68,7 @@ export async function createYooKassaPayment(
       amount: { value: "999.00", currency: "RUB" },
       confirmation: { type: "redirect", return_url: returnUrl },
       capture: true,
-      description: "GRILL IDEAS — валидация бизнес-идеи",
+      description: `${PRODUCT_NAME} — валидация бизнес-идеи`,
       metadata: { userId, analysisId },
     }),
   });

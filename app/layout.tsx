@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { SEO_DESCRIPTION, SEO_TITLE } from "@/lib/landing-content";
 import "./globals.css";
 
 const inter = Inter({
@@ -7,9 +8,25 @@ const inter = Inter({
   subsets: ["latin", "cyrillic"],
 });
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "GRILL IDEAS — maxima consulting",
-  description: "Жёсткая валидация бизнес-идей. Этапы 0–1 бесплатно.",
+  metadataBase: new URL(appUrl),
+  title: SEO_TITLE,
+  description: SEO_DESCRIPTION,
+  openGraph: {
+    title: SEO_TITLE,
+    description: SEO_DESCRIPTION,
+    url: appUrl,
+    siteName: "Grill My Idea",
+    locale: "ru_RU",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SEO_TITLE,
+    description: SEO_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

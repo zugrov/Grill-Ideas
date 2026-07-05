@@ -1,3 +1,5 @@
+import { PRODUCT_NAME } from "@/lib/brand";
+
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 type ChatMessage = {
@@ -23,7 +25,7 @@ export async function streamChatCompletion(
       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
       "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-      "X-Title": "GRILL IDEAS by maxima consulting",
+      "X-Title": `${PRODUCT_NAME} by maxima consulting`,
     },
     body: JSON.stringify({
       model: resolveModel(),

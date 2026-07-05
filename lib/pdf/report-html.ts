@@ -1,4 +1,5 @@
 import { STAGE_TITLES } from "@/lib/form-fields";
+import { PRODUCT_NAME, PRODUCT_TAGLINE } from "@/lib/brand";
 import type { Analysis, AnalysisMessage, ProjectInputData } from "@/lib/types";
 
 function escapeHtml(text: string): string {
@@ -30,7 +31,7 @@ function renderMessage(m: AnalysisMessage): string {
 
   return `
     <div class="assistant-msg">
-      <p class="msg-label">GRILL</p>
+      <p class="msg-label">${PRODUCT_NAME}</p>
       <div class="content">${mdToHtml(m.content)}</div>
     </div>`;
 }
@@ -40,7 +41,7 @@ export function buildReportHtml(
   messages: AnalysisMessage[],
 ): string {
   const input = analysis.input_data as ProjectInputData;
-  const title = input?.name?.trim() || "Анализ GRILL";
+  const title = input?.name?.trim() || `Анализ ${PRODUCT_NAME}`;
   const completed = analysis.completed_at
     ? new Date(analysis.completed_at).toLocaleDateString("ru-RU")
     : "—";
@@ -69,7 +70,7 @@ export function buildReportHtml(
 <html lang="ru">
 <head>
   <meta charset="utf-8"/>
-  <title>${escapeHtml(title)} — GRILL IDEAS</title>
+  <title>${escapeHtml(title)} — ${escapeHtml(PRODUCT_NAME)}</title>
   <style>
     @page { margin: 20mm; }
     body {
@@ -102,12 +103,12 @@ export function buildReportHtml(
 </head>
 <body>
   <div class="header">
-    <div class="brand">GRILL IDEAS · maxima consulting</div>
+    <div class="brand">${escapeHtml(PRODUCT_TAGLINE)}</div>
     <h1>${escapeHtml(title)}</h1>
     <p class="meta">Завершён: ${completed} · ${sorted.length} сообщений</p>
   </div>
   ${stages}
-  <div class="footer">Сгенерировано GRILL IDEAS · maxima consulting</div>
+  <div class="footer">Сгенерировано ${escapeHtml(PRODUCT_TAGLINE)}</div>
 </body>
 </html>`;
 }

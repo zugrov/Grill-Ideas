@@ -57,7 +57,7 @@ export function AnalysisForm({ onSubmit, loading }: AnalysisFormProps) {
         className="w-full"
         onClick={() => onSubmit(form)}
       >
-        {loading ? "Сохранение..." : "Запустить GRILL — этап 0"}
+        {loading ? "Сохранение..." : "Запустить анализ — этап 0"}
       </Button>
     </div>
   );

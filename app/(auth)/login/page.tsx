@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { PRODUCT_TAGLINE } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -59,7 +60,7 @@ export default function LoginPage() {
       <div className="h-1.5 bg-gradient-to-r from-mc-primary from-40% to-mc-invert-bg to-40%" />
       <main className="max-w-md mx-auto px-6 py-16">
         <h1 className="text-2xl font-bold mb-2">Вход</h1>
-        <p className="text-mc-text-second text-sm mb-8">GRILL IDEAS · maxima consulting</p>
+        <p className="text-mc-text-second text-sm mb-8">{PRODUCT_TAGLINE}</p>
         <Suspense fallback={<p className="text-sm text-mc-text-muted">Загрузка...</p>}>
           <LoginForm />
         </Suspense>

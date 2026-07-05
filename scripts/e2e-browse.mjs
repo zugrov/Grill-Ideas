@@ -50,7 +50,7 @@ async function main() {
       const input = page.locator(`label:has-text("${label}")`).locator("..").locator("input");
       await input.fill(value);
     }
-    await page.click('button:has-text("Запустить GRILL")');
+    await page.click('button:has-text("Запустить анализ")');
     console.log("   OK form submitted");
 
     console.log(`3. Stage 0 streaming (up to ${STREAM_TIMEOUT_MS / 1000}s)`);

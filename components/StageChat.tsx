@@ -5,6 +5,7 @@ import {
   MAX_REPLIES_PER_STAGE,
   stageLabel,
 } from "@/lib/analysis";
+import { PRODUCT_NAME } from "@/lib/brand";
 import type { AnalysisMessage } from "@/lib/types";
 import { StreamingMarkdown } from "@/components/StreamingMarkdown";
 import { Button } from "@/components/ui/Button";
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 type StageChatProps = {
   analysisId: string;
   stage: number;
+  currentStage: number;
   messages: AnalysisMessage[];
   streaming: boolean;
   streamContent: string;
@@ -23,10 +25,13 @@ type StageChatProps = {
   repliesUsed: number;
   needsResume?: boolean;
   onRetryStage?: () => void;
+  readOnly?: boolean;
+  onReturnToCurrent?: () => void;
 };
 
 export function StageChat({
   stage,
+  currentStage,
   messages,
   streaming,
   streamContent,
@@ -38,13 +43,15 @@ export function StageChat({
   repliesUsed,
   needsResume,
   onRetryStage,
+  readOnly = false,
+  onReturnToCurrent,
 }: StageChatProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [replyText, setReplyText] = useState("");
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamContent, streaming]);
+  }, [messages, streamContent, streaming, stage]);
 
   const stageThread = messages
     .filter((m) => m.stage === stage && m.role !== "system")
@@ -56,14 +63,18 @@ export function StageChat({
   const hasAssistantOnStage = stageThread.some((m) => m.role === "assistant");
   const repliesLeft = MAX_REPLIES_PER_STAGE - repliesUsed;
   const canReply =
+    !readOnly &&
     hasAssistantOnStage &&
     !needsResume &&
     !streaming &&
     repliesLeft > 0 &&
-    !replyLoading;
+    !replyLoading &&
+    stage === currentStage;
 
   const isEmpty =
     stageThread.length === 0 && !streamContent && !streaming;
+
+  const showActions = !readOnly && stage === currentStage;
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -75,28 +86,39 @@ export function StageChat({
 
   return (
     <div className="space-y-6">
+      {readOnly && stage !== currentStage && onReturnToCurrent && (
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-mc-bg border border-mc-border rounded-md">
+          <p className="text-sm text-mc-text-second">
+            Просмотр этапа {stage}: {stageLabel(stage)}
+          </p>
+          <Button type="button" variant="secondary" onClick={onReturnToCurrent}>
+            Вернуться к этапу {currentStage}
+          </Button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold">
             Этап {stage}: {stageLabel(stage)}
           </h2>
-          {needsResume && !streaming && (
+          {needsResume && !streaming && showActions && (
             <p className="text-xs text-mc-text-muted mt-1">
               Запускаем анализ этапа...
             </p>
           )}
         </div>
-        {streaming && (
+        {streaming && stage === currentStage && (
           <span className="text-xs text-mc-primary animate-pulse">Генерация...</span>
         )}
       </div>
-      {streaming && (
+      {streaming && stage === currentStage && (
         <p className="text-xs text-mc-text-muted -mt-4">
           Генерация может занять несколько минут — не закрывайте страницу.
         </p>
       )}
       <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-        {isEmpty && needsResume && (
+        {isEmpty && needsResume && showActions && (
           <p className="text-sm text-mc-text-muted">Подготовка ответа модели...</p>
         )}
         {stageThread.map((m) => (
@@ -109,7 +131,9 @@ export function StageChat({
             }
           >
             <p className="text-xs text-mc-text-muted mb-3">
-              {m.role === "user" ? "Вы" : `GRILL · этап ${m.stage}`}
+              {m.role === "user"
+                ? "Вы"
+                : `${PRODUCT_NAME} · этап ${m.stage}`}
             </p>
             {m.role === "user" ? (
               <p className="text-sm whitespace-pre-wrap">{m.content}</p>
@@ -118,7 +142,7 @@ export function StageChat({
             )}
           </div>
         ))}
-        {streaming && streamContent && (
+        {streaming && streamContent && stage === currentStage && (
           <div className="bg-mc-card border border-mc-primary/30 rounded-lg p-5">
             <StreamingMarkdown content={streamContent} />
           </div>
@@ -126,7 +150,7 @@ export function StageChat({
         <div ref={bottomRef} />
       </div>
 
-      {hasAssistantOnStage && !needsResume && (
+      {showActions && hasAssistantOnStage && !needsResume && (
         <div className="space-y-3 border-t border-mc-border pt-4">
           {canReply ? (
             <form onSubmit={handleSubmit} className="space-y-3">
@@ -162,12 +186,12 @@ export function StageChat({
         </div>
       )}
 
-      {canContinue && !streaming && (
+      {showActions && canContinue && !streaming && (
         <Button onClick={onContinue} disabled={continueLoading} className="w-full">
           {continueLoading ? "Запуск..." : "Продолжить → следующий этап"}
         </Button>
       )}
-      {needsResume && !streaming && !canContinue && onRetryStage && (
+      {showActions && needsResume && !streaming && !canContinue && onRetryStage && (
         <Button onClick={onRetryStage} variant="secondary" className="w-full">
           Запустить этап заново
         </Button>

@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { PRODUCT_NAME } from "@/lib/brand";
 
 export default function PrivacyPage() {
   return (
@@ -9,8 +10,8 @@ export default function PrivacyPage() {
       <main className="max-w-3xl mx-auto px-6 py-12 prose prose-sm">
         <h1>Политика конфиденциальности</h1>
         <p>
-          maxima consulting обрабатывает персональные данные пользователей GRILL
-          IDEAS в целях регистрации, оказания услуги анализа и обработки платежей.
+          maxima consulting обрабатывает персональные данные пользователей сервиса{" "}
+          {PRODUCT_NAME} в целях регистрации, оказания услуги анализа и обработки платежей.
         </p>
         <h2>Какие данные собираем</h2>
         <ul>

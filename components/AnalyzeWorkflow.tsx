@@ -5,16 +5,15 @@ import { useSearchParams } from "next/navigation";
 import { AnalysisForm } from "@/components/AnalysisForm";
 import { PaymentGate } from "@/components/PaymentGate";
 import { StageChat } from "@/components/StageChat";
+import { StageSidebar } from "@/components/StageSidebar";
 import { Button } from "@/components/ui/Button";
-import { MAX_STAGE, countUserRepliesOnStage } from "@/lib/analysis";
+import {
+  MAX_STAGE,
+  countCompletedStages,
+  countUserRepliesOnStage,
+  hasAssistantMessageForStage,
+} from "@/lib/analysis";
 import type { Analysis, AnalysisMessage, ProjectInputData } from "@/lib/types";
-
-function hasAssistantMessageForStage(
-  messages: AnalysisMessage[],
-  stage: number,
-): boolean {
-  return messages.some((m) => m.role === "assistant" && m.stage === stage);
-}
 
 type Props = {
   initialAnalysis: Analysis | null;
@@ -35,16 +34,21 @@ export function AnalyzeWorkflow({
   const [error, setError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
   const [replyLoading, setReplyLoading] = useState(false);
+  const [viewingStage, setViewingStage] = useState(initialAnalysis?.current_stage ?? 0);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const resumeAttempted = useRef(false);
 
   const showForm = !analysis || analysis.status === "draft";
-
+  const isCompleted = analysis?.status === "completed";
   const showPayment = analysis?.status === "awaiting_payment" && !isVip;
   const showChat =
     analysis &&
     !showForm &&
     !showPayment &&
-    analysis.status !== "completed";
+    !isCompleted;
+
+  const showSidebar =
+    !!analysis && !showForm && (showChat || showPayment || isCompleted);
 
   const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
   const currentStage = analysis?.current_stage ?? 0;
@@ -61,6 +65,13 @@ export function AnalyzeWorkflow({
     lastAssistant.stage === currentStage;
 
   const repliesUsed = countUserRepliesOnStage(messages, currentStage);
+  const completedStagesCount = countCompletedStages(messages);
+  const readOnly =
+    isCompleted || showPayment || viewingStage !== currentStage;
+
+  useEffect(() => {
+    setViewingStage(currentStage);
+  }, [currentStage, analysis?.id]);
 
   const runStream = useCallback(
     async (
@@ -220,29 +231,17 @@ export function AnalyzeWorkflow({
     setMessages([]);
     setStreamContent("");
     setError("");
+    setViewingStage(0);
+    setMobileSidebarOpen(false);
   }
 
-  if (analysis?.status === "completed") {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">Анализ завершён</h2>
-        <p className="text-mc-text-second mb-6">Все 15 этапов пройдены.</p>
-        <div className="flex flex-col gap-3 max-w-xs mx-auto">
-          <Button onClick={handleNewIdea} className="w-full">
-            Начать новую идею
-          </Button>
-          <a
-            href={`/api/analysis/${analysis.id}/pdf`}
-            className="inline-block w-full py-2.5 px-4 rounded-md border border-mc-border text-sm font-medium hover:bg-mc-bg"
-          >
-            Скачать PDF
-          </a>
-          <a href="/dashboard/history" className="text-mc-primary font-medium text-sm">
-            Смотреть в истории →
-          </a>
-        </div>
-      </div>
-    );
+  function selectStage(stage: number) {
+    setViewingStage(stage);
+    setMobileSidebarOpen(false);
+  }
+
+  function returnToCurrent() {
+    setViewingStage(currentStage);
   }
 
   return (
@@ -255,25 +254,77 @@ export function AnalyzeWorkflow({
       {showForm && (
         <AnalysisForm onSubmit={handleFormSubmit} loading={formLoading || streaming} />
       )}
-      {showPayment && analysis && (
-        <PaymentGate analysisId={analysis.id} onPaid={refreshAnalysis} />
-      )}
-      {showChat && analysis && (
-        <StageChat
-          analysisId={analysis.id}
-          stage={currentStage}
-          messages={messages}
-          streaming={streaming}
-          streamContent={streamContent}
-          onContinue={handleContinue}
-          onReply={handleReply}
-          continueLoading={streaming}
-          replyLoading={replyLoading}
-          canContinue={canContinue}
-          repliesUsed={repliesUsed}
-          needsResume={needsStageResume}
-          onRetryStage={handleRetryStage}
-        />
+
+      {showSidebar && analysis && (
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={() => setMobileSidebarOpen(true)}
+            className="md:hidden w-full py-2.5 px-4 rounded-md border border-mc-border bg-mc-card text-sm font-medium hover:bg-mc-bg"
+          >
+            Этапы ({completedStagesCount}/{MAX_STAGE + 1})
+          </button>
+
+          <div className="flex flex-col md:flex-row gap-6">
+            <StageSidebar
+              analysis={analysis}
+              messages={messages}
+              currentStage={currentStage}
+              viewingStage={viewingStage}
+              isVip={isVip}
+              mobileOpen={mobileSidebarOpen}
+              onSelectStage={selectStage}
+              onMobileClose={() => setMobileSidebarOpen(false)}
+            />
+
+            <div className="flex-1 min-w-0">
+              {isCompleted && (
+                <div className="flex flex-wrap items-start justify-between gap-4 mb-6 pb-4 border-b border-mc-border">
+                  <div>
+                    <h2 className="text-xl font-bold">Анализ завершён</h2>
+                    <p className="text-sm text-mc-text-second mt-1">
+                      Все {MAX_STAGE + 1} этапов пройдены
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <a
+                      href={`/api/analysis/${analysis.id}/pdf`}
+                      className="inline-block px-4 py-2 rounded-md border border-mc-border text-sm font-medium hover:bg-mc-bg"
+                    >
+                      Скачать PDF
+                    </a>
+                    <Button onClick={handleNewIdea}>Новая идея</Button>
+                  </div>
+                </div>
+              )}
+
+              {showPayment && (
+                <PaymentGate analysisId={analysis.id} onPaid={refreshAnalysis} />
+              )}
+
+              {(showChat || isCompleted) && (
+                <StageChat
+                  analysisId={analysis.id}
+                  stage={viewingStage}
+                  currentStage={currentStage}
+                  messages={messages}
+                  streaming={streaming}
+                  streamContent={streamContent}
+                  onContinue={handleContinue}
+                  onReply={handleReply}
+                  continueLoading={streaming}
+                  replyLoading={replyLoading}
+                  canContinue={canContinue}
+                  repliesUsed={repliesUsed}
+                  needsResume={needsStageResume}
+                  onRetryStage={handleRetryStage}
+                  readOnly={readOnly}
+                  onReturnToCurrent={returnToCurrent}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

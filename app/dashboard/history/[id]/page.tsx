@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { STAGE_TITLES } from "@/lib/form-fields";
+import { PRODUCT_NAME } from "@/lib/brand";
 import { StreamingMarkdown } from "@/components/StreamingMarkdown";
 import type { Analysis, AnalysisMessage } from "@/lib/types";
 
@@ -92,7 +93,7 @@ export default async function HistoryDetailPage({
                   }
                 >
                   <p className="text-xs text-mc-text-muted mb-3">
-                    {m.role === "user" ? "Ваше уточнение" : "GRILL"}
+                    {m.role === "user" ? "Ваше уточнение" : PRODUCT_NAME}
                   </p>
                   {m.role === "user" ? (
                     <p className="text-sm whitespace-pre-wrap">{m.content}</p>

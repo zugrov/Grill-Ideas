@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { PRODUCT_NAME } from "@/lib/brand";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function DashboardLayout({
@@ -21,7 +22,7 @@ export default async function DashboardLayout({
           <span className="text-xs uppercase tracking-widest text-mc-text-muted">
             maxima consulting
           </span>
-          <h1 className="text-lg font-bold text-mc-primary">GRILL IDEAS</h1>
+          <h1 className="text-lg font-bold text-mc-primary">{PRODUCT_NAME}</h1>
         </div>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/dashboard/analyze" className="hover:text-mc-primary">
@@ -45,7 +46,7 @@ export default async function DashboardLayout({
           </form>
         </nav>
       </header>
-      <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-10">{children}</main>
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-6 py-10">{children}</main>
     </div>
   );
 }

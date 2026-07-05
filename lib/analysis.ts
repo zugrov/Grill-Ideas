@@ -109,3 +109,57 @@ export function buildOpenRouterMessages(
 export function stageLabel(stage: number): string {
   return STAGE_TITLES[stage] ?? `Этап ${stage}`;
 }
+
+export function hasAssistantMessageForStage(
+  messages: AnalysisMessage[],
+  stage: number,
+): boolean {
+  return messages.some((m) => m.role === "assistant" && m.stage === stage);
+}
+
+export function hasPaidStageAccess(analysis: Analysis, isVip: boolean): boolean {
+  return isVip || isPaidAnalysisStatus(analysis.status);
+}
+
+export type StageNavStatus = "done" | "current" | "locked" | "upcoming";
+
+export function getStageNavStatus(
+  stage: number,
+  analysis: Analysis,
+  messages: AnalysisMessage[],
+  isVip: boolean,
+): StageNavStatus {
+  if (stage > MAX_FREE_STAGE && !hasPaidStageAccess(analysis, isVip)) {
+    return "locked";
+  }
+
+  if (stage === analysis.current_stage) {
+    return "current";
+  }
+
+  if (hasAssistantMessageForStage(messages, stage)) {
+    return "done";
+  }
+
+  return "upcoming";
+}
+
+export function isStageNavClickable(
+  status: StageNavStatus,
+  messages: AnalysisMessage[],
+  stage: number,
+): boolean {
+  return status === "done" && hasAssistantMessageForStage(messages, stage);
+}
+
+export function countCompletedStages(messages: AnalysisMessage[]): number {
+  let count = 0;
+  for (let stage = 0; stage <= MAX_STAGE; stage++) {
+    if (hasAssistantMessageForStage(messages, stage)) {
+      count++;
+    }
+  }
+  return count;
+}
+
+export const STAGE_NUMBERS = Array.from({ length: MAX_STAGE + 1 }, (_, i) => i);

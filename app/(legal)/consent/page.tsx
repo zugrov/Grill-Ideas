@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { PRODUCT_NAME } from "@/lib/brand";
 
 export default function ConsentPage() {
   return (
@@ -9,7 +10,7 @@ export default function ConsentPage() {
       <main className="max-w-3xl mx-auto px-6 py-12 prose prose-sm">
         <h1>Согласие на обработку персональных данных</h1>
         <p>
-          Регистрируясь в GRILL IDEAS, вы даёте согласие maxima consulting на
+          Регистрируясь в сервисе {PRODUCT_NAME}, вы даёте согласие maxima consulting на
           обработку персональных данных: email, данные профиля, содержание
           бизнес-идей и результатов анализа.
         </p>

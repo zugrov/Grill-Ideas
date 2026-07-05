@@ -13,6 +13,14 @@
   --mc-error: #ef4444;
   --mc-invert-bg: #111827;
   --mc-invert-text: #ffffff;
+
+  --grill-bg: #0a0a0b;
+  --grill-surface: #18181b;
+  --grill-green: #2ecc71;
+  --grill-blue: #2d8cff;
+  --grill-fire: #ff6b35;
+  --grill-text: #ffffff;
+  --grill-muted: #8e8e93;
 }
 
 @theme inline {
@@ -28,6 +36,13 @@
   --color-mc-error: var(--mc-error);
   --color-mc-invert-bg: var(--mc-invert-bg);
   --color-mc-invert-text: var(--mc-invert-text);
+  --color-grill-bg: var(--grill-bg);
+  --color-grill-surface: var(--grill-surface);
+  --color-grill-green: var(--grill-green);
+  --color-grill-blue: var(--grill-blue);
+  --color-grill-fire: var(--grill-fire);
+  --color-grill-text: var(--grill-text);
+  --color-grill-muted: var(--grill-muted);
   --font-sans: var(--font-inter);
 }
 

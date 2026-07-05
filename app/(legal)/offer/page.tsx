@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PRODUCT_NAME } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -26,7 +27,7 @@ export default function OfferPage() {
   return (
     <LegalLayout title="Публичная оферта">
       <p>
-        Настоящая оферта определяет условия оказания услуги «GRILL IDEAS» —
+        Настоящая оферта определяет условия оказания услуги сервиса {PRODUCT_NAME} —
         поэтапная валидация бизнес-идеи с использованием AI-анализа.
       </p>
       <h2>1. Предмет</h2>

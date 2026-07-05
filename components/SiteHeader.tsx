@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PRODUCT_NAME } from "@/lib/brand";
 
 type SiteHeaderProps = {
   ctaHref?: string;
@@ -17,7 +18,7 @@ export function SiteHeader({
         <span className="block text-[0.6rem] tracking-[0.18em] uppercase text-mc-text-second font-normal">
           maxima consulting
         </span>
-        GRILL IDEAS
+        {PRODUCT_NAME}
       </Link>
       <div className="flex items-center gap-4">
         {showAuth && (
