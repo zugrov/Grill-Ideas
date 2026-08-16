@@ -12,10 +12,16 @@
 
 ## Локальный запуск
 
-1. Скопируйте `.env.example` → `.env.local` и заполните ключи
-2. Миграции уже в Supabase (см. `supabase/migrations/`)
-3. `npm install && npm run dev` → http://localhost:3000
-4. Webhook ЮKassa локально — HTTPS-туннель:
+Секреты хранятся в [Infisical Cloud](https://app.infisical.com) (проект `GRILL-IDEAS`, env `dev`).
+
+```bash
+brew install infisical/get-cli/infisical   # один раз
+infisical login                            # один раз, GitHub SSO
+npm install
+infisical run --env dev -- npm run dev     # http://localhost:3000
+```
+
+Файл `.env.example` — только список ключей. Локальный `.env.local` не нужен.
 
 ```bash
 ./scripts/local-webhook-tunnel.sh   # localtunnel (или TUNNEL=ngrok)
