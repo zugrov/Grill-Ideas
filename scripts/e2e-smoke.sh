@@ -99,8 +99,8 @@ if [[ "$STATUS" != "paid_in_progress" ]]; then
 fi
 echo "OK analysis status=paid_in_progress"
 
-if [[ -n "${OPENROUTER_API_KEY:-}" ]]; then
-  echo "== 6. Stream stage 2 (OpenRouter via Supabase session) =="
+if [[ -n "${LLM_ROUTER_INTERNAL_SECRET:-}" ]]; then
+  echo "== 6. Stream stage 2 (llm-router via Supabase session) =="
   TOKEN=$(curl -sS -X POST "${SUPABASE}/auth/v1/token?grant_type=password" \
     -H "apikey: ${ANON}" \
     -H "Content-Type: application/json" \
@@ -117,7 +117,7 @@ if [[ -n "${OPENROUTER_API_KEY:-}" ]]; then
     echo "SKIP stream — could not get session token"
   fi
 else
-  echo "SKIP stage stream — OPENROUTER_API_KEY empty (add key to .env.local)"
+  echo "SKIP stage stream — LLM_ROUTER_INTERNAL_SECRET empty (add secret to .env.local)"
 fi
 
 echo ""
